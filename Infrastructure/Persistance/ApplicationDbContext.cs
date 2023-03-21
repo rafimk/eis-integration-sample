@@ -9,6 +9,14 @@ public class ApplicationDbContext : ApplicationDbContext, IApplicationDbContext
         _domainEventService = domainEventService;
     }
 
+    public override async Task<int> SaveChangesAsync()
+    {
+        var result = await base.SaveChangesAsync(CancellationToken);
+        await DispatchEvents();
+
+        return result;
+    }
+
     private async Task DispatchEvents()
     {
         while (true)
